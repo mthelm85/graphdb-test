@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 export default {
   data () {
     return {
@@ -27,9 +28,24 @@ export default {
       ]
     }
   },
+
+  computed: {
+    caseInfo () {
+      return this.$store.state.caseInfo
+    }
+  },
+
   methods: {
+    ...mapMutations([
+      'saveEstabInfo'
+    ]),
     save () {
-      console.log('TBD')
+      const info = {
+        tradeName: this.estabInfo[0].value,
+        address: this.estabInfo[1].value,
+        numberEmployees: this.estabInfo[2].value
+      }
+      this.saveEstabInfo(info)
     }
   }
 }

@@ -142,6 +142,14 @@ export default {
         this.caseBasics[2].value = res.records[0]._fields[0].properties.lead_whi
         this.invPeriod[0].value = res.records[0]._fields[0].properties.inv_period_start
         this.invPeriod[1].value = res.records[0]._fields[0].properties.inv_period_end
+        const info = {
+          caseID: res.records[0]._fields[0].properties.id,
+          invOffice: res.records[0]._fields[0].properties.whd_office,
+          whiName: res.records[0]._fields[0].properties.lead_whi,
+          invStart: res.records[0]._fields[0].properties.inv_period_start,
+          invEnd: res.records[0]._fields[0].properties.inv_period_end
+        }
+        this.saveCaseInfo(info)
       } else if (res.records.length === 0) {
         this.alerts.type = 'error'
         this.alerts.message = 'A case with that ID was not found.'
