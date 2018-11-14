@@ -6,7 +6,7 @@
           <v-flex v-for="e in estabInfo" :key="e.label" xs4>
             <v-text-field
               :label="e.label"
-              v-model="e.value"
+              v-model.trim="e.value"
             ></v-text-field>
           </v-flex>
         </v-layout>
@@ -39,13 +39,27 @@ export default {
     ...mapMutations([
       'saveEstabInfo'
     ]),
-    save () {
+    async save () {
       const info = {
         tradeName: this.estabInfo[0].value,
         address: this.estabInfo[1].value,
         numberEmployees: this.estabInfo[2].value
       }
       this.saveEstabInfo(info)
+      const res = await this.$neo4j.run(
+        `
+          MERGE (estab:Establishment {
+            trade_name: "${this.estabInfo[0].value}",
+            address: "${this.estabInfo[1].value}",
+            number_employees: "${this.estabInfo[2].value}"
+          })
+          WITH estab
+          MATCH (case:Case { id: '${this.caseInfo.caseID}' })
+          MERGE (case)-[r:INCLUDES]->(estab)
+          RETURN (case)-[r]-(estab)
+        `
+      ).catch(e => console.log(e))
+      console.log(res)
     }
   }
 }

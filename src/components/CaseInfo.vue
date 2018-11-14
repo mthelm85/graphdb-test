@@ -85,7 +85,7 @@ export default {
   },
 
   async created () {
-    await this.$neo4j.connect('bolt', 'localhost', 7687, 'neo4j', 'supersafepass', false)
+    await this.$neo4j.connect('bolt', 'localhost', 11001, 'neo4j', 'supersafepass', false)
   },
 
   methods: {
@@ -104,14 +104,14 @@ export default {
       const res = await this.$neo4j.run(
         `
           MERGE (case:Case {
-            id: '${this.caseBasics[0].value}',
-            whd_office: '${this.caseBasics[1].value}',
-            lead_whi: '${this.caseBasics[2].value}',
-            inv_period_start: '${this.invPeriod[0].value}',
-            inv_period_end: '${this.invPeriod[1].value}'
+            id: "${this.caseBasics[0].value}",
+            whd_office: "${this.caseBasics[1].value}",
+            lead_whi: "${this.caseBasics[2].value}",
+            inv_period_start: "${this.invPeriod[0].value}",
+            inv_period_end: "${this.invPeriod[1].value}"
           })
           MERGE (whd_office: WHD_Office {
-            name: '${this.caseBasics[1].value}'
+            name: "${this.caseBasics[1].value}"
           })
           RETURN case
         `
