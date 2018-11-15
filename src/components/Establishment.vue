@@ -48,15 +48,17 @@ export default {
       this.saveEstabInfo(info)
       const res = await this.$neo4j.run(
         `
+          MATCH (case:Case { id: "${this.caseInfo.caseID}" })
+          MATCH (whd:WHD_Office { name: "${this.caseInfo.invOffice}" })
+          WITH case, whd
           MERGE (estab:Establishment {
             trade_name: "${this.estabInfo[0].value}",
             address: "${this.estabInfo[1].value}",
             number_employees: "${this.estabInfo[2].value}"
           })
-          WITH estab
-          MATCH (case:Case { id: '${this.caseInfo.caseID}' })
           MERGE (case)-[r:INCLUDES]->(estab)
-          RETURN (case)-[r]-(estab)
+          MERGE (estab)-[s:LOCATED_IN_JURISDICTION_OF]->(whd)
+          RETURN (estab)
         `
       ).catch(e => console.log(e))
       console.log(res)
