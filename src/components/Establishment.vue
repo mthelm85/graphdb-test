@@ -3,10 +3,22 @@
     <v-form>
       <v-container grid-list-md>
         <v-layout row wrap>
-          <v-flex v-for="e in estabInfo" :key="e.label" xs4>
+          <v-flex xs4>
             <v-text-field
-              :label="e.label"
-              v-model.trim="e.value"
+              label="Trade Name"
+              v-model.trim="tradeName"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs4>
+            <v-text-field
+              label="Address"
+              v-model.trim="address"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs4>
+            <v-text-field
+              label="No. of Employees"
+              v-model.trim="numberEmployees"
             ></v-text-field>
           </v-flex>
         </v-layout>
@@ -17,44 +29,51 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
 export default {
   data () {
     return {
-      estabInfo: [
-        { label: 'Trade Name', value: '' },
-        { label: 'Address', value: '' },
-        { label: 'No. of Employees', value: '' }
-      ]
+
     }
   },
 
   computed: {
-    caseInfo () {
-      return this.$store.state.caseInfo
+    tradeName: {
+      get () {
+        return this.$store.state.estabInfo.tradeName
+      },
+      set (name) {
+        this.$store.commit('saveTradeName', name)
+      }
+    },
+    address: {
+      get () {
+        return this.$store.state.estabInfo.address
+      },
+      set (address) {
+        this.$store.commit('saveAddress', address)
+      }
+    },
+    numberEmployees: {
+      get () {
+        return this.$store.state.estabInfo.numberEmployees
+      },
+      set (num) {
+        this.$store.commit('saveNumberEmployees', num)
+      }
     }
   },
 
   methods: {
-    ...mapMutations([
-      'saveEstabInfo'
-    ]),
     async save () {
-      const info = {
-        tradeName: this.estabInfo[0].value,
-        address: this.estabInfo[1].value,
-        numberEmployees: this.estabInfo[2].value
-      }
-      this.saveEstabInfo(info)
       const res = await this.$neo4j.run(
         `
-          MATCH (case:Case { id: "${this.caseInfo.caseID}" })
-          MATCH (whd:WHD_Office { name: "${this.caseInfo.invOffice}" })
+          MATCH (case:Case { id: "${this.$store.state.caseInfo.caseID}" })
+          MATCH (whd:WHD_Office { name: "${this.$store.state.caseInfo.invOffice}" })
           WITH case, whd
           MERGE (estab:Establishment {
-            trade_name: "${this.estabInfo[0].value}",
-            address: "${this.estabInfo[1].value}",
-            number_employees: "${this.estabInfo[2].value}"
+            trade_name: "${this.tradeName}",
+            address: "${this.address}",
+            number_employees: "${this.numberEmployees}"
           })
           MERGE (case)-[r:INCLUDES]->(estab)
           MERGE (estab)-[s:LOCATED_IN_JURISDICTION_OF]->(whd)

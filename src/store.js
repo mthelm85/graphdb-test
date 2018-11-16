@@ -20,18 +20,14 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    saveCaseInfo (state, info) {
-      state.caseInfo.caseID = info.caseID
-      state.caseInfo.invOffice = info.invOffice
-      state.caseInfo.whiName = info.whiName
-      state.caseInfo.invStart = info.invStart
-      state.caseInfo.invEnd = info.invEnd
-    },
-    saveEstabInfo (state, info) {
-      state.estabInfo.tradeName = info.tradeName
-      state.estabInfo.address = info.address
-      state.estabInfo.numberEmployees = info.numberEmployees
-    }
+    saveCaseID (state, id) { state.caseInfo.caseID = id },
+    saveInvOffice (state, office) { state.caseInfo.invOffice = office },
+    saveWhiName (state, name) { state.caseInfo.whiName = name },
+    saveInvStart (state, date) { state.caseInfo.invStart = date },
+    saveInvEnd (state, date) { state.caseInfo.invEnd = date },
+    saveTradeName (state, name) { state.estabInfo.tradeName = name },
+    saveAddress (state, address) { state.estabInfo.address = address },
+    saveNumberEmployees (state, number) { state.estabInfo.numberEmployees = number }
   },
 
   actions: {

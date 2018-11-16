@@ -14,27 +14,7 @@
           <v-flex xs3>
             <v-btn @click="search" color="primary" dark>Search</v-btn>
           </v-flex>
-        </v-layout>
-        <strong>Case Basics</strong>
-        <v-layout row wrap>
-          <v-flex v-for="e in caseBasics" :key="e.label" xs4>
-            <v-text-field
-              :label="e.label"
-              v-model="e.value"
-            ></v-text-field>
-          </v-flex>
-        </v-layout>
-        <strong>Investigation Period</strong>
-        <v-layout row wrap>
-          <v-flex v-for="e in invPeriod" :key="e.label" xs6>
-            <DatePicker v-on:invDate="e.value = $event" :label="e.label" :value="e.value"></DatePicker>
-          </v-flex>
-        </v-layout>
-        <v-layout row wrap>
-          <v-flex xs3>
-            <v-btn @click="save" color="primary">Save</v-btn>
-          </v-flex>
-          <v-flex xs9>
+          <v-flex xs6>
             <v-alert
               dismissible
               :value="alerts.save"
@@ -49,6 +29,41 @@
             </v-alert>
           </v-flex>
         </v-layout>
+        <strong>Case Basics</strong>
+        <v-layout row wrap>
+          <v-flex xs4>
+            <v-text-field
+              label="Case ID"
+              v-model.trim="caseID"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs4>
+            <v-text-field
+              label="Investigating Office"
+              v-model.trim="invOffice"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs4>
+            <v-text-field
+              label="Investigator"
+              v-model.trim="whiName"
+            ></v-text-field>
+          </v-flex>
+        </v-layout>
+        <strong>Investigation Period</strong>
+        <v-layout row wrap>
+          <v-flex xs6>
+            <DatePicker v-on:invDate="invStart = $event" label="Investigation Start" :value="invStart"></DatePicker>
+          </v-flex>
+          <v-flex xs6>
+            <DatePicker v-on:invDate="invEnd = $event" label="Investigation End" :value="invEnd"></DatePicker>
+          </v-flex>
+        </v-layout>
+        <v-layout row wrap>
+          <v-flex xs3>
+            <v-btn @click="save" color="primary">Save</v-btn>
+          </v-flex>
+        </v-layout>
       </v-container>
     </v-form>
   </v-card>
@@ -56,16 +71,10 @@
 
 <script>
 import DatePicker from '@/components/DatePicker'
-import { mapMutations } from 'vuex'
 
 export default {
   data () {
     return {
-      caseBasics: [
-        { label: 'Case ID', value: '' },
-        { label: 'Investigating Office', value: '' },
-        { label: 'Investigator', value: '' }
-      ],
       invPeriod: [
         { label: 'Investigation Start', value: '' },
         { label: 'Investigation End', value: '' }
@@ -84,34 +93,66 @@ export default {
     DatePicker
   },
 
+  computed: {
+    caseID: {
+      get () {
+        return this.$store.state.caseInfo.caseID
+      },
+      set (id) {
+        this.$store.commit('saveCaseID', id)
+      }
+    },
+    invOffice: {
+      get () {
+        return this.$store.state.caseInfo.invOffice
+      },
+      set (office) {
+        this.$store.commit('saveInvOffice', office)
+      }
+    },
+    whiName: {
+      get () {
+        return this.$store.state.caseInfo.whiName
+      },
+      set (name) {
+        this.$store.commit('saveWhiName', name)
+      }
+    },
+    invStart: {
+      get () {
+        return this.$store.state.caseInfo.invStart
+      },
+      set (date) {
+        this.$store.commit('saveInvStart', date)
+      }
+    },
+    invEnd: {
+      get () {
+        return this.$store.state.caseInfo.invEnd
+      },
+      set (date) {
+        this.$store.commit('saveInvEnd', date)
+      }
+    }
+  },
+
   async created () {
     await this.$neo4j.connect('bolt', 'localhost', 11001, 'neo4j', 'supersafepass', false)
   },
 
   methods: {
-    ...mapMutations([
-      'saveCaseInfo'
-    ]),
     async save () {
-      const info = {
-        caseID: this.caseBasics[0].value,
-        invOffice: this.caseBasics[1].value,
-        whiName: this.caseBasics[2].value,
-        invStart: this.invPeriod[0].value,
-        invEnd: this.invPeriod[1].value
-      }
-      this.saveCaseInfo(info)
       const res = await this.$neo4j.run(
         `
           MERGE (case:Case {
-            id: "${this.caseBasics[0].value}",
-            whd_office: "${this.caseBasics[1].value}",
-            lead_whi: "${this.caseBasics[2].value}",
-            inv_period_start: "${this.invPeriod[0].value}",
-            inv_period_end: "${this.invPeriod[1].value}"
+            id: "${this.caseID}",
+            whd_office: "${this.invOffice}",
+            lead_whi: "${this.whiName}",
+            inv_period_start: "${this.invStart}",
+            inv_period_end: "${this.invEnd}"
           })
           MERGE (whd_office: WHD_Office {
-            name: "${this.caseBasics[1].value}"
+            name: "${this.invOffice}"
           })
           RETURN case
         `
@@ -129,27 +170,19 @@ export default {
         `
           MATCH (case:Case {
             id: '${this.searchInput}'
-          })
-          RETURN case
+          })-[INCLUDES]-(estab:Establishment)
+          RETURN case, estab
         `
       ).catch((e) => {
         this.alerts.search = true
       })
       console.log(res)
       if (res.records.length > 0) {
-        this.caseBasics[0].value = res.records[0]._fields[0].properties.id
-        this.caseBasics[1].value = res.records[0]._fields[0].properties.whd_office
-        this.caseBasics[2].value = res.records[0]._fields[0].properties.lead_whi
-        this.invPeriod[0].value = res.records[0]._fields[0].properties.inv_period_start
-        this.invPeriod[1].value = res.records[0]._fields[0].properties.inv_period_end
-        const info = {
-          caseID: res.records[0]._fields[0].properties.id,
-          invOffice: res.records[0]._fields[0].properties.whd_office,
-          whiName: res.records[0]._fields[0].properties.lead_whi,
-          invStart: res.records[0]._fields[0].properties.inv_period_start,
-          invEnd: res.records[0]._fields[0].properties.inv_period_end
-        }
-        this.saveCaseInfo(info)
+        this.$store.commit('saveCaseID', res.records[0]._fields[0].properties.id)
+        this.$store.commit('saveInvOffice', res.records[0]._fields[0].properties.whd_office)
+        this.$store.commit('saveWhiName', res.records[0]._fields[0].properties.lead_whi)
+        this.$store.commit('saveInvStart', res.records[0]._fields[0].properties.inv_period_start)
+        this.$store.commit('saveInvEnd', res.records[0]._fields[0].properties.inv_period_end)
       } else if (res.records.length === 0) {
         this.alerts.type = 'error'
         this.alerts.message = 'A case with that ID was not found.'
