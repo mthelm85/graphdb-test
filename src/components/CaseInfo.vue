@@ -183,6 +183,9 @@ export default {
         this.$store.commit('saveWhiName', res.records[0]._fields[0].properties.lead_whi)
         this.$store.commit('saveInvStart', res.records[0]._fields[0].properties.inv_period_start)
         this.$store.commit('saveInvEnd', res.records[0]._fields[0].properties.inv_period_end)
+        this.$store.commit('saveTradeName', res.records[0]._fields[1].properties.trade_name)
+        this.$store.commit('saveAddress', res.records[0]._fields[1].properties.address)
+        this.$store.commit('saveNumberEmployees', res.records[0]._fields[1].properties.number_employees)
       } else if (res.records.length === 0) {
         this.alerts.type = 'error'
         this.alerts.message = 'A case with that ID was not found.'

@@ -15,10 +15,16 @@
               v-model.trim="address"
             ></v-text-field>
           </v-flex>
-          <v-flex xs4>
+          <v-flex xs2>
             <v-text-field
               label="No. of Employees"
               v-model.trim="numberEmployees"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs2>
+            <v-text-field
+              label="NAICS"
+              v-model.trim="naics"
             ></v-text-field>
           </v-flex>
         </v-layout>
@@ -60,6 +66,14 @@ export default {
       set (num) {
         this.$store.commit('saveNumberEmployees', num)
       }
+    },
+    naics: {
+      get () {
+        return this.$store.state.estabInfo.naics
+      },
+      set (naics) {
+        this.$store.commit('saveNaics', naics)
+      }
     }
   },
 
@@ -75,8 +89,10 @@ export default {
             address: "${this.address}",
             number_employees: "${this.numberEmployees}"
           })
+          MERGE (naics:Naics { code: "${this.naics}" })
           MERGE (case)-[r:INCLUDES]->(estab)
           MERGE (estab)-[s:LOCATED_IN_JURISDICTION_OF]->(whd)
+          MERGE (estab)-[t:OPERATES_IN]->(naics)
           RETURN (estab)
         `
       ).catch(e => console.log(e))
