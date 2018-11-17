@@ -173,7 +173,8 @@ export default {
           })-[INCLUDES]-(estab:Establishment)
           WITH case, estab
           MATCH (estab)-[OPERATES_IN]->(naics:Naics)
-          RETURN case, estab, naics
+          MATCH (er:Employer3d)-[CONTROLS]->(estab)
+          RETURN case, estab, naics, er
         `
       ).catch((e) => {
         this.alerts.search = true
@@ -189,6 +190,8 @@ export default {
         this.$store.commit('saveAddress', res.records[0]._fields[1].properties.address)
         this.$store.commit('saveNumberEmployees', res.records[0]._fields[1].properties.number_employees)
         this.$store.commit('saveNaics', res.records[0]._fields[2].properties.code)
+        this.$store.commit('saveName3d', res.records[0]._fields[3].properties.name)
+        this.$store.commit('saveAddress3d', res.records[0]._fields[3].properties.address)
       } else if (res.records.length === 0) {
         this.alerts.type = 'error'
         this.alerts.message = 'A case with that ID was not found.'

@@ -30,13 +30,19 @@
         </v-layout>
         <strong>203(d) Employer</strong>
         <v-layout row wrap>
-          <v-flex xs6>
+          <v-flex xs4>
             <v-text-field
               label="Name"
               v-model.trim="name3d"
             ></v-text-field>
           </v-flex>
-          <v-flex xs6>
+          <v-flex xs4>
+            <v-text-field
+              label="Title"
+              v-model.trim="title3d"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs4>
             <v-text-field
               label="Address"
               v-model.trim="address3d"
@@ -98,6 +104,14 @@ export default {
         this.$store.commit('saveName3d', name)
       }
     },
+    title3d: {
+      get () {
+        return this.$store.state.estabInfo.title3d
+      },
+      set (title) {
+        this.$store.commit('title3d', title)
+      }
+    },
     address3d: {
       get () {
         return this.$store.state.estabInfo.address3d
@@ -121,6 +135,10 @@ export default {
             number_employees: "${this.numberEmployees}"
           })
           MERGE (naics:Naics { code: "${this.naics}" })
+          MERGE (employer:Employer3d {
+            name: "${this.name3d}",
+            address: "${this.address3d}"
+          })-[q:CONTROLS]->(estab)
           MERGE (case)-[r:INCLUDES]->(estab)
           MERGE (estab)-[s:LOCATED_IN_JURISDICTION_OF]->(whd)
           MERGE (estab)-[t:OPERATES_IN]->(naics)
