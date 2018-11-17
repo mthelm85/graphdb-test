@@ -17,7 +17,7 @@
           </v-flex>
           <v-flex xs2>
             <v-text-field
-              label="No. of Employees"
+              label="# of Employees"
               v-model.trim="numberEmployees"
             ></v-text-field>
           </v-flex>
@@ -25,6 +25,21 @@
             <v-text-field
               label="NAICS"
               v-model.trim="naics"
+            ></v-text-field>
+          </v-flex>
+        </v-layout>
+        <strong>203(d) Employer</strong>
+        <v-layout row wrap>
+          <v-flex xs6>
+            <v-text-field
+              label="Name"
+              v-model.trim="name3d"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs6>
+            <v-text-field
+              label="Address"
+              v-model.trim="address3d"
             ></v-text-field>
           </v-flex>
         </v-layout>
@@ -73,6 +88,22 @@ export default {
       },
       set (naics) {
         this.$store.commit('saveNaics', naics)
+      }
+    },
+    name3d: {
+      get () {
+        return this.$store.state.estabInfo.name3d
+      },
+      set (name) {
+        this.$store.commit('saveName3d', name)
+      }
+    },
+    address3d: {
+      get () {
+        return this.$store.state.estabInfo.address3d
+      },
+      set (address) {
+        this.$store.commit('saveAddress3d', address)
       }
     }
   },

@@ -16,7 +16,9 @@ export default new Vuex.Store({
       tradeName: '',
       address: '',
       numberEmployees: '',
-      naics: ''
+      naics: '',
+      name3d: '',
+      address3d: ''
     },
     bizEntity: {
       legalName: ''
@@ -33,7 +35,9 @@ export default new Vuex.Store({
     saveAddress (state, address) { state.estabInfo.address = address },
     saveNumberEmployees (state, number) { state.estabInfo.numberEmployees = number },
     saveNaics (state, naics) { state.estabInfo.naics = naics },
-    saveLegalName (state, name) { state.bizEntity.legalName = name }
+    saveLegalName (state, name) { state.bizEntity.legalName = name },
+    saveName3d (state, name) { state.estabInfo.name3d = name },
+    saveAddress3d (state, address) { state.estabInfo.address3d = address }
   },
 
   actions: {

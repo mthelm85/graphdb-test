@@ -171,7 +171,9 @@ export default {
           MATCH (case:Case {
             id: '${this.searchInput}'
           })-[INCLUDES]-(estab:Establishment)
-          RETURN case, estab
+          WITH case, estab
+          MATCH (estab)-[OPERATES_IN]->(naics:Naics)
+          RETURN case, estab, naics
         `
       ).catch((e) => {
         this.alerts.search = true
@@ -186,6 +188,7 @@ export default {
         this.$store.commit('saveTradeName', res.records[0]._fields[1].properties.trade_name)
         this.$store.commit('saveAddress', res.records[0]._fields[1].properties.address)
         this.$store.commit('saveNumberEmployees', res.records[0]._fields[1].properties.number_employees)
+        this.$store.commit('saveNaics', res.records[0]._fields[2].properties.code)
       } else if (res.records.length === 0) {
         this.alerts.type = 'error'
         this.alerts.message = 'A case with that ID was not found.'
