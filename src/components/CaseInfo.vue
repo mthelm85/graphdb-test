@@ -167,42 +167,51 @@ export default {
     },
     async search () {
       const res = await this.$neo4j.run(
-        // `
-        //   MATCH (case:Case {
-        //     id: '${this.searchInput}'
-        //   })-[INCLUDES]->(estab:Establishment)
-        //   WITH case, estab
-        //   MATCH (estab)-[OPERATES_IN]->(naics:Naics)
-        //   MATCH (er:Employer3d)-[CONTROLS]->(estab)
-        //   RETURN case, estab, naics, er
+        // `MATCH (case:Case {
+        //   id: "${this.searchInput}"
+        // })-[:INCLUDES]->(q)-[r]->(s)
+        // RETURN case, q, s
         // `
         `MATCH (case:Case {
           id: "${this.searchInput}"
-        })-[:INCLUDES]->(q)-[r]->(s)
-        RETURN case, q, r, s
+        })-[:INCLUDES]->(estab:Establishment)
+        WITH case, estab
+        MATCH (estab)-[:OPERATES_IN]->(naics:Naics)
+        RETURN case {
+          .id,
+          .inv_period_start,
+          .inv_period_end,
+          .lead_whi,
+          estabs: collect(estab {
+            .trade_name,
+            .address,
+            .number_employees
+          }),
+          naics
+        }
         `
       ).catch((e) => {
         this.alerts.search = true
       })
       console.log(res)
-      if (res.records.length > 0) {
-        this.$store.commit('saveCaseID', res.records[0]._fields[0].properties.id)
-        this.$store.commit('saveInvOffice', res.records[0]._fields[0].properties.whd_office)
-        this.$store.commit('saveWhiName', res.records[0]._fields[0].properties.lead_whi)
-        this.$store.commit('saveInvStart', res.records[0]._fields[0].properties.inv_period_start)
-        this.$store.commit('saveInvEnd', res.records[0]._fields[0].properties.inv_period_end)
-        this.$store.commit('saveTradeName', res.records[0]._fields[1].properties.trade_name)
-        this.$store.commit('saveAddress', res.records[0]._fields[1].properties.address)
-        this.$store.commit('saveNumberEmployees', res.records[0]._fields[1].properties.number_employees)
-        this.$store.commit('saveNaics', res.records[0]._fields[2].properties.code)
-        this.$store.commit('saveName3d', res.records[0]._fields[3].properties.name)
-        this.$store.commit('saveTitle3d', res.records[0]._fields[3].properties.title)
-        this.$store.commit('saveAddress3d', res.records[0]._fields[3].properties.address)
-      } else if (res.records.length === 0) {
-        this.alerts.type = 'error'
-        this.alerts.message = 'A case with that ID was not found.'
-        this.alerts.search = true
-      }
+      // if (res.records.length > 0) {
+      //   this.$store.commit('saveCaseID', res.records[0]._fields[0].properties.id)
+      //   this.$store.commit('saveInvOffice', res.records[0]._fields[0].properties.whd_office)
+      //   this.$store.commit('saveWhiName', res.records[0]._fields[0].properties.lead_whi)
+      //   this.$store.commit('saveInvStart', res.records[0]._fields[0].properties.inv_period_start)
+      //   this.$store.commit('saveInvEnd', res.records[0]._fields[0].properties.inv_period_end)
+      //   this.$store.commit('saveTradeName', res.records[0]._fields[1].properties.trade_name)
+      //   this.$store.commit('saveAddress', res.records[0]._fields[1].properties.address)
+      //   this.$store.commit('saveNumberEmployees', res.records[0]._fields[1].properties.number_employees)
+      //   this.$store.commit('saveNaics', res.records[0]._fields[3].properties.code)
+      //   this.$store.commit('saveName3d', res.records[0]._fields[3].properties.name)
+      //   this.$store.commit('saveTitle3d', res.records[0]._fields[3].properties.title)
+      //   this.$store.commit('saveAddress3d', res.records[0]._fields[3].properties.address)
+      // } else if (res.records.length === 0) {
+      //   this.alerts.type = 'error'
+      //   this.alerts.message = 'A case with that ID was not found.'
+      //   this.alerts.search = true
+      // }
     }
   }
 }

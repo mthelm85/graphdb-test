@@ -1,0 +1,19 @@
+{
+  CaseID: 123456,
+  Establishment: [
+    {
+      address: "987 Park Pl",
+      number_employees: "12",
+      trade_name: "Matt's Car Wash II",
+      Employer3d: "Matt Helm"
+    },
+    {
+      address: ,
+      number_employees: "6",
+      trade_name: ,
+      Employer3d: 
+    }
+  ],
+  WHD_Office: "Tulsa AO",
+  Naics: "811192"
+}
