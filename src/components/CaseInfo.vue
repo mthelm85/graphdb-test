@@ -167,14 +167,19 @@ export default {
     },
     async search () {
       const res = await this.$neo4j.run(
-        `
-          MATCH (case:Case {
-            id: '${this.searchInput}'
-          })-[INCLUDES]-(estab:Establishment)
-          WITH case, estab
-          MATCH (estab)-[OPERATES_IN]->(naics:Naics)
-          MATCH (er:Employer3d)-[CONTROLS]->(estab)
-          RETURN case, estab, naics, er
+        // `
+        //   MATCH (case:Case {
+        //     id: '${this.searchInput}'
+        //   })-[INCLUDES]->(estab:Establishment)
+        //   WITH case, estab
+        //   MATCH (estab)-[OPERATES_IN]->(naics:Naics)
+        //   MATCH (er:Employer3d)-[CONTROLS]->(estab)
+        //   RETURN case, estab, naics, er
+        // `
+        `MATCH (case:Case {
+          id: "${this.searchInput}"
+        })-[:INCLUDES]->(q)-[r]->(s)
+        RETURN case, q, r, s
         `
       ).catch((e) => {
         this.alerts.search = true
@@ -191,6 +196,7 @@ export default {
         this.$store.commit('saveNumberEmployees', res.records[0]._fields[1].properties.number_employees)
         this.$store.commit('saveNaics', res.records[0]._fields[2].properties.code)
         this.$store.commit('saveName3d', res.records[0]._fields[3].properties.name)
+        this.$store.commit('saveTitle3d', res.records[0]._fields[3].properties.title)
         this.$store.commit('saveAddress3d', res.records[0]._fields[3].properties.address)
       } else if (res.records.length === 0) {
         this.alerts.type = 'error'

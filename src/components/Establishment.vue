@@ -137,6 +137,7 @@ export default {
           MERGE (naics:Naics { code: "${this.naics}" })
           MERGE (employer:Employer3d {
             name: "${this.name3d}",
+            title: "${this.title3d}",
             address: "${this.address3d}"
           })-[q:CONTROLS]->(estab)
           MERGE (case)-[r:INCLUDES]->(estab)
