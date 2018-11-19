@@ -167,47 +167,26 @@ export default {
     },
     async search () {
       const res = await this.$neo4j.run(
-        // `MATCH (case:Case {
-        //   id: "${this.searchInput}"
-        // })-[:INCLUDES]->(q)-[r]->(s)
-        // RETURN case, q, s
-        // `
-        `MATCH p = (case:Case)-->(estab)-->(n)
-        WHERE case.id = "${this.searchInput}"
-        RETURN nodes(p)
+        `MATCH(case:Case {
+          id: "${this.searchInput}"
+        })
+        RETURN case
         `
       ).catch((e) => {
         this.alerts.search = true
       })
-      this.makeSet(res.records)
-      // if (res.records.length > 0) {
-      //   this.$store.commit('saveCaseID', res.records[0]._fields[0].properties.id)
-      //   this.$store.commit('saveInvOffice', res.records[0]._fields[0].properties.whd_office)
-      //   this.$store.commit('saveWhiName', res.records[0]._fields[0].properties.lead_whi)
-      //   this.$store.commit('saveInvStart', res.records[0]._fields[0].properties.inv_period_start)
-      //   this.$store.commit('saveInvEnd', res.records[0]._fields[0].properties.inv_period_end)
-      //   this.$store.commit('saveTradeName', res.records[0]._fields[1].properties.trade_name)
-      //   this.$store.commit('saveAddress', res.records[0]._fields[1].properties.address)
-      //   this.$store.commit('saveNumberEmployees', res.records[0]._fields[1].properties.number_employees)
-      //   this.$store.commit('saveNaics', res.records[0]._fields[3].properties.code)
-      //   this.$store.commit('saveName3d', res.records[0]._fields[3].properties.name)
-      //   this.$store.commit('saveTitle3d', res.records[0]._fields[3].properties.title)
-      //   this.$store.commit('saveAddress3d', res.records[0]._fields[3].properties.address)
-      // } else if (res.records.length === 0) {
-      //   this.alerts.type = 'error'
-      //   this.alerts.message = 'A case with that ID was not found.'
-      //   this.alerts.search = true
-      // }
-    },
-    makeSet (records) {
-      records.forEach((element) => {
-        for (let i = 0; i < element._fields.length; i++) {
-          element._fields[i]
-            .forEach((x) => {
-              console.log(x.properties)
-            })
-        }
-      })
+      console.log(res.records)
+      if (res.records.length > 0) {
+        this.$store.commit('saveCaseID', res.records[0]._fields[0].properties.id)
+        this.$store.commit('saveInvOffice', res.records[0]._fields[0].properties.whd_office)
+        this.$store.commit('saveWhiName', res.records[0]._fields[0].properties.lead_whi)
+        this.$store.commit('saveInvStart', res.records[0]._fields[0].properties.inv_period_start)
+        this.$store.commit('saveInvEnd', res.records[0]._fields[0].properties.inv_period_end)
+      } else if (res.records.length === 0) {
+        this.alerts.type = 'error'
+        this.alerts.message = 'A case with that ID was not found.'
+        this.alerts.search = true
+      }
     }
   }
 }
