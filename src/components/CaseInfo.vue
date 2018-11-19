@@ -172,28 +172,14 @@ export default {
         // })-[:INCLUDES]->(q)-[r]->(s)
         // RETURN case, q, s
         // `
-        `MATCH (case:Case {
-          id: "${this.searchInput}"
-        })-[:INCLUDES]->(estab:Establishment)
-        WITH case, estab
-        MATCH (estab)-[:OPERATES_IN]->(naics:Naics)
-        RETURN case {
-          .id,
-          .inv_period_start,
-          .inv_period_end,
-          .lead_whi,
-          estabs: collect(estab {
-            .trade_name,
-            .address,
-            .number_employees
-          }),
-          naics
-        }
+        `MATCH p = (case:Case)-->(estab)-->(n)
+        WHERE case.id = "${this.searchInput}"
+        RETURN nodes(p)
         `
       ).catch((e) => {
         this.alerts.search = true
       })
-      console.log(res)
+      this.makeSet(res.records)
       // if (res.records.length > 0) {
       //   this.$store.commit('saveCaseID', res.records[0]._fields[0].properties.id)
       //   this.$store.commit('saveInvOffice', res.records[0]._fields[0].properties.whd_office)
@@ -212,6 +198,16 @@ export default {
       //   this.alerts.message = 'A case with that ID was not found.'
       //   this.alerts.search = true
       // }
+    },
+    makeSet (records) {
+      records.forEach((element) => {
+        for (let i = 0; i < element._fields.length; i++) {
+          element._fields[i]
+            .forEach((x) => {
+              console.log(x.properties)
+            })
+        }
+      })
     }
   }
 }
