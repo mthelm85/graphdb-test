@@ -8,6 +8,7 @@
       <v-tab
         v-for="tab in tabs"
         :key="tab.index"
+        @click="search(tab.search)"
         ripple>
         {{ tab.title }}
       </v-tab>
@@ -32,17 +33,20 @@ export default {
         {
           title: 'Case Info',
           component: 'CaseInfo',
-          index: 0
+          index: 0,
+          search: 'caseInfo'
         },
         {
           title: 'Establishment',
           component: 'Establishment',
-          index: 1
+          index: 1,
+          search: 'estab'
         },
         {
           title: 'Business Entity',
           component: 'BizEntity',
-          index: 2
+          index: 2,
+          search: 'bizEntity'
         }
       ]
     }
@@ -55,7 +59,27 @@ export default {
   },
 
   methods: {
-
+    async search (tab) {
+      if (tab === 'estab') {
+        const res = await this.$neo4j.run(
+          `MATCH(case:Case {
+            id: "${this.$store.state.caseInfo.caseID}"
+          })-[:INCLUDES]->(estab:Establishment)
+          RETURN collect(estab)
+          `
+        ).catch((e) => {
+          console.log(e)
+        })
+        console.log(res.records)
+        if (res.records.length > 0) {
+          this.$store.commit('saveTradeName', res.records[0]._fields[0][0].properties.trade_name)
+          this.$store.commit('saveAddress', res.records[0]._fields[0][0].properties.address)
+          this.$store.commit('saveNumberEmployees', res.records[0]._fields[0][0].properties.number_employees)
+        }
+      } else if (tab === 'bizEntity') {
+        console.log('bizEntity')
+      }
+    }
   }
 }
 </script>

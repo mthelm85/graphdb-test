@@ -109,7 +109,7 @@ export default {
         return this.$store.state.estabInfo.title3d
       },
       set (title) {
-        this.$store.commit('title3d', title)
+        this.$store.commit('saveTitle3d', title)
       }
     },
     address3d: {
@@ -132,7 +132,8 @@ export default {
           MERGE (estab:Establishment {
             trade_name: "${this.tradeName}",
             address: "${this.address}",
-            number_employees: "${this.numberEmployees}"
+            number_employees: "${this.numberEmployees}",
+            naics: "${this.naics}"
           })
           MERGE (naics:Naics { code: "${this.naics}" })
           MERGE (employer:Employer3d {
