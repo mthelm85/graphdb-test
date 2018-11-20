@@ -65,7 +65,9 @@ export default {
           `MATCH(case:Case {
             id: "${this.$store.state.caseInfo.caseID}"
           })-[:INCLUDES]->(estab:Establishment)
-          RETURN collect(estab)
+          WITH estab
+          MATCH (er:Employer3d)-[:CONTROLS]->(estab)
+          RETURN collect(estab), er
           `
         ).catch((e) => {
           console.log(e)
@@ -75,6 +77,10 @@ export default {
           this.$store.commit('saveTradeName', res.records[0]._fields[0][0].properties.trade_name)
           this.$store.commit('saveAddress', res.records[0]._fields[0][0].properties.address)
           this.$store.commit('saveNumberEmployees', res.records[0]._fields[0][0].properties.number_employees)
+          this.$store.commit('saveNaics', res.records[0]._fields[0][0].properties.naics)
+          this.$store.commit('saveName3d', res.records[0]._fields[1].properties.name)
+          this.$store.commit('saveTitle3d', res.records[0]._fields[1].properties.title)
+          this.$store.commit('saveAddress3d', res.records[0]._fields[1].properties.address)
         }
       } else if (tab === 'bizEntity') {
         console.log('bizEntity')
