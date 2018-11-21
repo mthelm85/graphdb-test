@@ -54,7 +54,7 @@
           absolute
           dark
           fab
-          top
+          bottom
           right
           color="accent">
           <v-icon>add</v-icon>

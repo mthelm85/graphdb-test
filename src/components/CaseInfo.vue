@@ -137,7 +137,7 @@ export default {
   },
 
   async created () {
-    await this.$neo4j.connect('bolt', 'localhost', 7687, 'neo4j', 'supersafepass', false)
+    await this.$neo4j.connect('bolt', 'localhost', 11001, 'neo4j', 'supersafepass', false)
   },
 
   methods: {

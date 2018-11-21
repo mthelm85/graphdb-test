@@ -4,7 +4,7 @@
       v-model="active"
       color="primary"
       dark
-      slider-color="yellow">
+      slider-color="accent">
       <v-tab
         v-for="tab in tabs"
         :key="tab.index"
