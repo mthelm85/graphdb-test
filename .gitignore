@@ -1,6 +1,5 @@
 .DS_Store
 node_modules
-secret.js
 
 # local env files
 .env.local

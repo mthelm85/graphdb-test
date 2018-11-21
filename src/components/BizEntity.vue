@@ -17,7 +17,7 @@
           </v-flex>
         </v-layout>
         <strong>Shareholders/Partners/Corporate Officers</strong>
-        <v-layout v-for="i in numberOfPeople.array" :key="i.array.name" row wrap>
+        <v-layout v-for="i in numberOfPeople.array" :key="i.index" row wrap>
           <v-flex xs6>
             <v-text-field
               label="Name"
@@ -41,6 +41,12 @@
             <v-icon>add</v-icon>
           </v-btn>
         </v-layout>
+        <v-layout row wrap>
+          <v-flex xs3>
+            <v-btn @click="save" color="primary">Save</v-btn>
+          </v-flex>
+        </v-layout>
+      </v-container>
       </v-container>
     </v-form>
   </v-card>
@@ -53,7 +59,7 @@ export default {
       numberOfPeople: {
         counter: 0,
         array: [
-          { name: this.name0, address: this.address0 }
+          { name: this.name0, address: this.address0, index: 0 }
         ]
       }
     }
@@ -129,10 +135,42 @@ export default {
   methods: {
     newPerson () {
       this.numberOfPeople.counter++
-      this.numberOfPeople.array.push({
-        name: `this.name${this.numberOfPeople.counter}`,
-        address: `this.address${this.numberOfPeople.counter}`
-      })
+      switch (this.numberOfPeople.counter) {
+        case 1:
+          this.numberOfPeople.array.push({
+            name: this.name1,
+            address: this.address1,
+            index: 1
+          })
+          break
+        case 2:
+          this.numberOfPeople.array.push({
+            name: this.name2,
+            address: this.address2,
+            index: 2
+          })
+          break
+        default:
+          break
+      }
+    },
+    async save () {
+      const res = await this.$neo4j.run(
+        `MATCH (case:Case { id: "${this.$store.state.caseInfo.caseID}" })
+        -[:INCLUDES]-(estab:Establishment { trade_name: "${this.$store.state.estabInfo.tradeName}" })
+        MERGE (ent:Business_Entity {
+          legalName: "${this.legalName}",
+          address: "${this.address}",
+          shareholder0: "${this.name0}",
+          address0: "${this.address0}",
+          shareholder1: "${this.name1}",
+          address1: "${this.address1}",
+          shareholder2: "${this.name2}",
+          address2: "${this.address2}"
+        })
+        MERGE (ent)-[:OPERATES]->(estab)
+        `
+      )
     }
   }
 }

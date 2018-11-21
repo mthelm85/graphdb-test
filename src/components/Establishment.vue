@@ -50,15 +50,6 @@
           </v-flex>
         </v-layout>
         <v-btn @click="save" color="primary">Save</v-btn>
-        <v-btn
-          absolute
-          dark
-          fab
-          bottom
-          right
-          color="accent">
-          <v-icon>add</v-icon>
-        </v-btn>
       </v-container>
     </v-form>
   </v-card>
