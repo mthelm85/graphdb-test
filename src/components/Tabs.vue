@@ -66,7 +66,7 @@ export default {
             id: "${this.$store.state.caseInfo.caseID}"
           })-[:INCLUDES]->(estab:Establishment)
           WITH estab
-          MATCH (er:Employer3d)-[:CONTROLS]->(estab)
+          OPTIONAL MATCH (er:Employer3d)-[:CONTROLS]->(estab)
           RETURN collect(estab), er
           `
         ).catch((e) => {
@@ -83,7 +83,22 @@ export default {
           this.$store.commit('saveAddress3d', res.records[0]._fields[1].properties.address)
         }
       } else if (tab === 'bizEntity') {
-        console.log('bizEntity')
+        const res = await this.$neo4j.run(
+          `MATCH(case:Case {
+            id: "${this.$store.state.caseInfo.caseID}"
+          })-[:INCLUDES]->(estab:Establishment)
+          WITH estab
+          OPTIONAL MATCH (ent:Business_Entity)-[:OPERATES]->(estab)
+          RETURN collect(estab), ent
+          `
+        )
+        console.log(res)
+        if (res.records.length > 0) {
+          let ents = res.records.filter((record) => {
+            record._fields[1].labels.includes('Business_Entity')
+          })
+          console.log(ents)
+        }
       }
     }
   }

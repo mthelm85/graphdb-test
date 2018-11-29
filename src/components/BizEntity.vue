@@ -47,7 +47,6 @@
           </v-flex>
         </v-layout>
       </v-container>
-      </v-container>
     </v-form>
   </v-card>
 </template>
@@ -155,7 +154,7 @@ export default {
       }
     },
     async save () {
-      const res = await this.$neo4j.run(
+      await this.$neo4j.run(
         `MATCH (case:Case { id: "${this.$store.state.caseInfo.caseID}" })
         -[:INCLUDES]-(estab:Establishment { trade_name: "${this.$store.state.estabInfo.tradeName}" })
         MERGE (ent:Business_Entity {
