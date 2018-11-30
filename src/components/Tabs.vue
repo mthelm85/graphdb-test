@@ -92,12 +92,18 @@ export default {
           RETURN collect(estab), ent
           `
         )
-        console.log(res)
+        console.log(res.records)
         if (res.records.length > 0) {
-          let ents = res.records.filter((record) => {
-            record._fields[1].labels.includes('Business_Entity')
-          })
-          console.log(ents)
+          let ents = res.records
+            .map(record => {
+              return record._fields
+            })
+            .map((field, i) => {
+              return Array.isArray(field) ? field[i] : false
+            })
+            .filter(item => item.labels)
+            .filter(item => item.labels.includes('Business_Entity'))
+          console.log(ents[0].properties)
         }
       }
     }
